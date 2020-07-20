@@ -1,5 +1,5 @@
-def get_filter_expression_snpsift(w):
-    expression = config["calling"]["filter"][w.filter].get("expression_snpsift", None)
+def get_filter_expression(w):
+    expression = config["calling"]["filter"][w.filter].get("expression", None)
     if expression is None:
         return ""
     return f"vembrane - \"{expression}\" |"
@@ -19,13 +19,12 @@ rule filter_by_annotation:
     log:
         "logs/filter-calls/{group}.{filter}.log"
     params:
-        filter_snpsift=get_filter_expression_snpsift,
-        filter_vep=get_filter_expression_vep,
+        filter_expression=get_filter_expression,
         region=get_filter_region
     conda:
         "../envs/vembrane.yaml"
     shell:
-        "(bcftools view {input} {params.region} | {params.filter_vep} {params.filter_snpsift} bcftools view -Ob > {output}) 2> {log}"
+        "(bcftools view {input} {params.region} | sed 's/#CHROM/##INFO=<ID=END,Number=1,Type=Integer>\\n#CHROM/' | {params.filter_expression} bcftools view -Ob > {output}) 2> {log}"
 
 
 def pre_fdr_command(wc):
