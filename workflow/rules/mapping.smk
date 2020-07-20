@@ -64,4 +64,4 @@ rule recalibrate_base_qualities:
     params:
         extra=config["params"]["gatk"]["BaseRecalibrator"]
     wrapper:
-        "file:///vol/huge/christo/snakemake-wrappers/bio/gatk/baserecalibratorspark"
+        "file:wrapper/baserecalibratorspark"

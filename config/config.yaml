@@ -1,6 +1,6 @@
-samples: config/samples_trios.tsv
+samples: config/samples_epilepsie.tsv
 
-units: config/units_trios.tsv
+units: config/units_epilepsie.tsv
 
 igv_report:
   activate: False
@@ -51,7 +51,7 @@ oncoprint:
 
 calling:
   limit-regions:
-    activate: true
+    activate: false
     regions: resources/SeqCap_EZ_Exome_v3_no_chr_hg38_primary_targets.bed
 
   delly:
@@ -70,7 +70,8 @@ calling:
     #    filtername: "ANN[*].IMPACT has 'MODERATE'"
     #lowMAF_nearGene: "!(ANN[ALL].EFFECT =~ 'intergenic_region|intron_variant|upstream_gene_variant|downstream_gene_variant|.*UTR.*|non_coding.*|TF_binding_site_variant') & !(gnomad_AF>0.01) & !(ANN[ALL].ERRORS has 'ERROR_CHROMOSOME_NOT_FOUND')"
     #non_intergenic: "!(ANN[ALL].EFFECT =~ 'intergenic_region') & !(gnomad_AF>0.1)"
-    non_intergenic: "!(ANN[ALL].EFFECT =~ 'intergenic_region')"
+    non_intergenic:
+      expression: "ANN['Consequence']!='intergenic_variant'"
     # non_coding?
   fdr-control:
     threshold: 0.05
@@ -80,9 +81,13 @@ calling:
       #  varlociraptor: 
       #    - "ALL"
       #  filter: lowMAF_nearGene
-      DENOVO:
+      ALL_NON_INTERGENIC:
         varlociraptor: 
-          - "denovo"
+          - "ALL"
+        filter: non_intergenic
+      THREE_OF_FOUR_NON_INTERGENIC:
+        varlociraptor: 
+          - "THREE_OF_FOUR"
         filter: non_intergenic
 
 remove_duplicates:

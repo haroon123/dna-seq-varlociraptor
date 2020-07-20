@@ -14,7 +14,7 @@ rule cutadapt_pipe:
     output:
         pipe('pipe/cutadapt/{sample}/{unit}.{fq}.{ext}')
     log:
-        "logs/pipe-fastqs/catadapt/{sample}-{unit}.{fq}.{ext}.log"
+        "logs/pipe-fastqs/cutadapt/{sample}/{unit}.{fq}.{ext}.log"
     wildcard_constraints:
         ext=r"fastq|fastq\.gz"
     threads: 0 # this does not need CPU
@@ -26,9 +26,9 @@ rule cutadapt_pe:
     input:
         get_cutadapt_input
     output:
-        fastq1=pipe("results/trimmed/{sample}-{unit}.1.fastq.gz"),
-        fastq2=pipe("results/trimmed/{sample}-{unit}.2.fastq.gz"),
-        qc="results/trimmed/{sample}-{unit}.paired.qc.txt"
+        fastq1="results/trimmed/adapters/{sample}/{unit}_R1.fastq.gz",
+        fastq2="results/trimmed/adapters/{sample}/{unit}_R2.fastq.gz",
+        qc="results/trimmed/adapters/{sample}/{unit}.paired.qc.txt"
     log:
         "logs/cutadapt/{sample}-{unit}.log"
     params:
@@ -36,7 +36,7 @@ rule cutadapt_pe:
         adapters = lambda w: str(units.loc[w.sample].loc[w.unit, "adapters"]),
     threads: 8
     wrapper:
-        "0.59.2/bio/cutadapt/pe"
+        "file:/vol/huge/christo/snakemake-wrappers/bio/cutadapt/pe"
 
 rule cutadapt_se:
     input:

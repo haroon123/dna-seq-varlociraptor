@@ -24,12 +24,12 @@ rule bam_index:
     log:
         "logs/bam-index/{prefix}.log"
     wildcard_constraints:
-        prefix="^results"
+        prefix=r"^results/.*"
     wrapper:
         "0.59.2/bio/samtools/index"
 
 
-rule bam_temp:
+rule bam_index_temp:
     input:
         "{prefix}.bam"
     output:
@@ -37,7 +37,7 @@ rule bam_temp:
     log:
         "logs/bam-index/{prefix}.log"
     wildcard_constraints:
-        prefix="^tmp"
+        prefix=r"^tmp/.*"
     wrapper:
         "0.59.2/bio/samtools/index"
 

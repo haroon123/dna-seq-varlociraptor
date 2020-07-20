@@ -32,6 +32,7 @@
 #         "0.50.4/bio/snpeff"
 
 rule annotate_variants:
+    threads: 8
     input:
         calls="results/calls/{group}.bcf",
         cache="resources/vep/cache",
