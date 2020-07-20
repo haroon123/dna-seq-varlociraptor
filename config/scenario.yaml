@@ -7,17 +7,18 @@
 
 samples:
   index:
-    resolution: 3
+    resolution: 5
     universe: "0.0 | 0.5 | 1.0"
   father:
-    resolution: 3
-    universe: "0.0 | 0.5 | 1.0"
+    resolution: 5
+    universe: "[0.0,0.15] | 0.5 | 1.0"
   mother:
-    resolution: 3
-    universe: "0.0 | 0.5 | 1.0"
+    resolution: 5
+    universe: "[0.0,0.15] | 0.5 | 1.0"
 
 events:
   denovo: "index:[0.5,1.0] & father:0.0 & mother:0.0"
-  homozygous_recessive: "index:1.0 & (mother:0.5 | father:0.5)"
-  compount_heterozgous_candidate: "index:0.5 & ((father:0.0 & mother:0.5) | (father:0.5 & mother:0.0))"
+  homozygous_recessive: "index:1.0 & mother:0.5 & father:0.5"
+  compound_heterozygous_candidate_mother: "index:0.5 & father:0.0 & mother:0.5"
+  compound_heterozygous_candidate_father: "index:0.5 & father:0.5 & mother:0.0"
   not_interesting: "index:0.0 | father:1.0 | mother:1.0 | (index:0.5 & mother:0.5 & father:0.5)"

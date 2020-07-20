@@ -1,0 +1,8 @@
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - ensembl-vep =100
+  - bcftools =1.10
+  - pysam =0.15
+  - snpsift =4.3.1

@@ -19,7 +19,7 @@ def get_final_output():
         final_output = expand("results/merged-calls/{group}.{event}.fdr-controlled.{ending}",
                         group=groups,
                         event=config["calling"]["fdr-control"]["events"],
-                        ending=["bcf", "tsv"],)
+                        ending=["bcf", "xlsx"],)
     return final_output
 
 def _group_or_sample(row):
