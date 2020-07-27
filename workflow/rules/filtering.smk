@@ -2,7 +2,7 @@ def get_filter_expression(w):
     expression = config["calling"]["filter"][w.filter].get("expression", None)
     if expression is None:
         return ""
-    return f"vembrane - \"{expression}\" |"
+    return f"vembrane \"{expression}\" - |"
 
 def get_filter_region(w):
     region = config["calling"]["filter"][w.filter].get("region", None)

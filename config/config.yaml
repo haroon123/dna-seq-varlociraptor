@@ -71,7 +71,7 @@ calling:
     #lowMAF_nearGene: "!(ANN[ALL].EFFECT =~ 'intergenic_region|intron_variant|upstream_gene_variant|downstream_gene_variant|.*UTR.*|non_coding.*|TF_binding_site_variant') & !(gnomad_AF>0.01) & !(ANN[ALL].ERRORS has 'ERROR_CHROMOSOME_NOT_FOUND')"
     #non_intergenic: "!(ANN[ALL].EFFECT =~ 'intergenic_region') & !(gnomad_AF>0.1)"
     non_intergenic:
-      expression: "ANN['Consequence']!='intergenic_variant'"
+      expression: "ANN['Consequence']!='intergenic_variant' and ('gnomad_AF' not in INFO or INFO['gnomad_AF'][0] < 0.01)"
     # non_coding?
   fdr-control:
     threshold: 0.05
@@ -82,13 +82,13 @@ calling:
       #    - "ALL"
       #  filter: lowMAF_nearGene
       ALL_NON_INTERGENIC:
-        varlociraptor: 
+        varlociraptor:
           - "ALL"
         filter: non_intergenic
-      THREE_OF_FOUR_NON_INTERGENIC:
-        varlociraptor: 
-          - "THREE_OF_FOUR"
-        filter: non_intergenic
+      # THREE_OF_FOUR_NON_INTERGENIC:
+      #   varlociraptor: 
+      #     - "THREE_OF_FOUR"
+      #   filter: non_intergenic
 
 remove_duplicates:
   activate: true

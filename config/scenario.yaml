@@ -7,7 +7,7 @@
 
 samples:
   index:
-    resolution: 5
+    resolution: 3
     universe: "0.0 | 0.5 | 1.0"
   father:
     resolution: 5
