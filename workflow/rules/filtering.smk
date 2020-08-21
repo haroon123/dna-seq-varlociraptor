@@ -19,7 +19,8 @@ rule filter_by_annotation:
     log:
         "logs/filter-calls/annotation/{group}.{filter}.log"
     params:
-        filter_expression=get_filter_expression,
+        filter=lambda w: config["calling"]["filter"][w.filter]
+        #filter_expression=get_filter_expression,
         #region=get_filter_region
     conda:
         "../envs/vembrane.yaml"

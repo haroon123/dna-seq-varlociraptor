@@ -1,6 +1,6 @@
 samples: config/samples_aicardi.tsv
 
-units: config/units_aicardi.txt
+units: config/units_aicardi.tsv
 
 igv_report:
   activate: False

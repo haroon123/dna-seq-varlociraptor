@@ -36,7 +36,8 @@ rule cutadapt_pe:
         adapters = lambda w: str(units.loc[w.sample].loc[w.unit, "adapters"]),
     threads: 8
     wrapper:
-        "file:/vol/huge/christo/snakemake-wrappers/bio/cutadapt/pe"
+        "0.59.2/bio/cutadapt/pe"
+
 
 rule cutadapt_se:
     input:
