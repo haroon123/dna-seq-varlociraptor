@@ -21,6 +21,8 @@ primers:
     activate: false
     primers_fa1: ""
     primers_fa2: ""
+    library_error: 0
+    library_length: 0
 
 
 # Estimation of tumor mutational burden.
@@ -48,7 +50,7 @@ calling:
   scenario: config/scenario.yaml
   # See http://snpeff.sourceforge.net/SnpSift.html#filter
   filter:
-    moderate: "ANN[*].IMPACT has 'MODERATE'"
+    moderate: "ANN['IMPACT'] == 'MODERATE'"
   fdr-control:
     threshold: 0.05
     events: 
@@ -63,6 +65,8 @@ annotations:
     known: resources/variation.vcf.gz
   dgidb:
     activate: true
+    datasources:
+      - DrugBank
   vep:
     params: --everything
     plugins:
@@ -77,3 +81,4 @@ params:
     MarkDuplicates: ""
   gatk:
     BaseRecalibrator: ""
+    applyBQSR: ""

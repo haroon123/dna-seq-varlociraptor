@@ -1,8 +1,5 @@
 channels:
-  - default
   - conda-forge
   - bioconda
 dependencies:
-  - vembrane =0.3.2
-  - bcftools =1.10
-  - htslib =1.10
+  - vembrane =0.4

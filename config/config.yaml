@@ -1,6 +1,6 @@
-samples: config/samples_epilepsie.tsv
+samples: config/samples_aicardi.tsv
 
-units: config/units_epilepsie.tsv
+units: config/units_aicardi.txt
 
 igv_report:
   activate: False
@@ -24,6 +24,10 @@ primers:
     # path to fasta files containg primer sequences
     primers_fa1: "path/to/primer-fa1"
     primers_fa2: "path/to/primer-fa2"
+     # Library mean + error determines the maximum insert size between the outer primer ends.
+    library_error: 0
+    # Mean insert size between the outer primer ends.
+    library_length: 0
 
 # Estimation of tumor mutational burden.
 tmb:
@@ -32,6 +36,11 @@ tmb:
   # Attention: when doing panel sequencing, set this to the
   # CAPTURED coding genome, not the entire one!
   coding_genome_size: 3e7
+  # Plotting modes - hist (stratified histogram)
+  # or curve (stratified curve)
+  mode:
+    - hist
+    - curve
   # Name of the tumor sample in the scenario.yaml.
   tumor_sample: tumor
   somatic_events:
@@ -53,7 +62,6 @@ calling:
   limit-regions:
     activate: false
     regions: resources/SeqCap_EZ_Exome_v3_no_chr_hg38_primary_targets.bed
-
   delly:
     activate: false
   freebayes:
@@ -70,9 +78,7 @@ calling:
     #    filtername: "ANN[*].IMPACT has 'MODERATE'"
     #lowMAF_nearGene: "!(ANN[ALL].EFFECT =~ 'intergenic_region|intron_variant|upstream_gene_variant|downstream_gene_variant|.*UTR.*|non_coding.*|TF_binding_site_variant') & !(gnomad_AF>0.01) & !(ANN[ALL].ERRORS has 'ERROR_CHROMOSOME_NOT_FOUND')"
     #non_intergenic: "!(ANN[ALL].EFFECT =~ 'intergenic_region') & !(gnomad_AF>0.1)"
-    non_intergenic:
-      expression: "ANN['Consequence']!='intergenic_variant' and ('gnomad_AF' not in INFO or INFO['gnomad_AF'][0] < 0.01)"
-    # non_coding?
+    non_intergenic: "ANN['Consequence']!='intergenic_variant' and ('gnomad_AF' not in INFO or INFO['gnomad_AF'][0] < 0.01)"
   fdr-control:
     threshold: 0.05
     events: 
@@ -104,6 +110,10 @@ annotations:
     # cosmic: path/to/cosmic.vcf.gz
   dgidb:
     activate: true
+    # List of datasources for filtering dgidb entries
+    # Available sources can be found on http://dgidb.org/api/v2/interaction_sources.json
+    datasources:
+      - DrugBank
   vep:
     params: --everything
     plugins:
@@ -117,4 +127,5 @@ params:
     MarkDuplicates: "VALIDATION_STRINGENCY=LENIENT"
   gatk:
     BaseRecalibrator: ""
-  freebayes: "--haplotype-length -1 -G 4 -F 0.15"
+    freebayes: "--haplotype-length -1 -G 4 -g 1000"
+    applyBQSR: ""

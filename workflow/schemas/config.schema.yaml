@@ -58,6 +58,10 @@ properties:
             type: string
           primers_fq2:
             type: string
+          library_error:
+            type: integer
+          library_length:
+            type: integer
 
 
   oncoprint:
@@ -150,6 +154,10 @@ properties:
         properties:
           activate:
             type: boolean
+          datasources:
+            type: array
+            items: 
+              type: string
       vep:
         properties:
           params:
@@ -179,8 +187,11 @@ properties:
         properties:
           BaseRecalibrator:
             type: string
+          applyBQSR:
+            type: string
         required:
           - BaseRecalibrator
+          - applyBQSR
       picard:
         type: object
         properties:

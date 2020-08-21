@@ -24,6 +24,7 @@ include: "rules/gridss.smk"
 include: "rules/strling.smk"
 include: "rules/cnvpytor.smk"
 include: "rules/tsv.smk"
+include: "rules/primers.smk"
 
 groups = samples["group"].unique()
 

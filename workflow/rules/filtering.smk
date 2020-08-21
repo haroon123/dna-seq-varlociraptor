@@ -15,16 +15,31 @@ rule filter_by_annotation:
     input:
         get_annotated_bcf
     output:
-        "results/calls/{group}.{filter}.filtered.bcf"
+        "results/calls/{group}.{filter}.filtered_ann.bcf"
     log:
-        "logs/filter-calls/{group}.{filter}.log"
+        "logs/filter-calls/annotation/{group}.{filter}.log"
     params:
         filter_expression=get_filter_expression,
-        region=get_filter_region
+        #region=get_filter_region
     conda:
         "../envs/vembrane.yaml"
     shell:
-        "(bcftools view {input} {params.region} | sed 's/#CHROM/##INFO=<ID=END,Number=1,Type=Integer>\\n#CHROM/' | {params.filter_expression} bcftools view -Ob > {output}) 2> {log}"
+        "vembrane {params.filter:q} {input} --output-fmt bcf --output {output} &> {log}"
+
+
+rule filter_odds:
+    input:
+        "results/calls/{group}.{filter}.filtered_ann.bcf"
+    output:
+        "results/calls/{group}.{event}.{filter}.filtered_odds.bcf"
+    params:
+        events=lambda wc: config["calling"]["fdr-control"]["events"][wc.event]["varlociraptor"]
+    log:
+        "logs/filter-calls/posterior_odds/{group}.{event}.{filter}.log"
+    conda:
+        "../envs/varlociraptor.yaml"
+    shell:
+        "varlociraptor filter-calls posterior-odds --events {params.events} --odds barely < {input} > {output} 2> {log}"
 
 
 def pre_fdr_command(wc):
@@ -35,7 +50,7 @@ def pre_fdr_command(wc):
 
 rule pre_fdr:
     input:
-        "results/calls/{group}.{filter}.filtered.bcf"
+        "results/calls/{group}.{event}.{filter}.filtered_odds.bcf"
     output:
         "tmp/pre_fdr/{group}.{vartype}.{event}.{filter}.fdr-controlled.bcf"
     params:

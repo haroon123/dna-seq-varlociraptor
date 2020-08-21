@@ -65,8 +65,9 @@ def get_cutadapt_input(wildcards):
 
 
 def get_cutadapt_pipe_input(wildcards):
-    files = list(sorted(glob.glob(units.loc[wildcards.sample].loc[wildcards.unit, wildcards.fq])))
-    assert(len(files) > 0)
+    pattern = units.loc[wildcards.sample].loc[wildcards.unit, wildcards.fq]
+    files = list(sorted(glob.glob(pattern)))
+    assert(len(files) > 0), "no files found at {}".format(pattern)
     return files
 
 
@@ -80,11 +81,16 @@ def is_paired_end(sample):
     assert all_single or all_paired, "invalid units for sample {}, must be all paired end or all single end".format(sample)
     return all_paired
 
+def group_is_paired_end(wildcards):
+    samples = get_group_samples(wildcards)
+    return all([is_paired_end(sample) for sample in samples])
+
 def get_map_reads_input(wildcards):
     if is_paired_end(wildcards.sample):
         return ["results/merged/{sample}_R1.fastq.gz",
                 "results/merged/{sample}_R2.fastq.gz"]
     return "results/merged/{sample}_single.fastq.gz"
+
 
 def get_group_aliases(wildcards):
     return samples.loc[samples["group"] == wildcards.group]["alias"]
@@ -94,15 +100,18 @@ def get_group_samples(wildcards):
     return samples.loc[samples["group"] == wildcards.group]["sample_name"]
 
 
-def get_group_bams(wildcards):
-    return expand("results/recal/{sample}.sorted.bam", sample=get_group_samples(wildcards))
+def get_group_bams(wildcards, bai=False):
+    ext = ".bai" if bai else ""
+    if group_is_paired_end(wildcards) and is_activated("primers/trimming"):
+        return expand("results/trimmed/{sample}.trimmed.bam{ext}", sample=get_group_samples(wildcards), ext=ext)
+    return expand("results/recal/{sample}.sorted.bam{ext}", sample=get_group_samples(wildcards), ext=ext)
 
 
 def get_regions():
     if is_activated("calling/limit-regions"):
         return config["calling"]["limit-regions"]["regions"]
     if is_activated("primers/trimming"):
-        return "results/primers/target_regions.bed"
+        return "results/primers/target_regions.merged.bed"
     else:
         return []
 
@@ -117,9 +126,6 @@ def get_group_observations(wildcards):
                   caller=wildcards.caller, 
                   group=wildcards.group,
                   sample=get_group_samples(wildcards))
-
-def get_group_bais(wildcards):
-    return expand("results/recal/{sample}.sorted.bam.bai", sample=get_group_samples(wildcards))
 
 def is_activated(xpath):
     c = config
@@ -136,8 +142,9 @@ def get_read_group(wildcards):
 
 def get_tmb_targets():
     if is_activated("tmb"):
-        return expand("results/plots/tmb/{group}.tmb.svg",
-                      group=groups)
+        return expand("results/plots/tmb/{group}.{mode}.tmb.svg",
+                      group=groups,
+                      mode=config["tmb"].get("mode", "curve"))
     else:
         return []
 
@@ -156,8 +163,6 @@ def get_annotated_bcf(wildcards, group=None):
     selection = ".annotated"
     if is_activated("annotations/vcfs"):
         selection += ".db-annotated"
-    if is_activated("annotations/dbnsfp"):
-        selection += ".dbnsfp"
     if is_activated("annotations/dgidb"):
         selection += ".dgidb"
     return "results/calls/{group}{selection}.bcf".format(group=group, selection=selection)
@@ -168,6 +173,8 @@ def get_oncoprint_batch(wildcards):
         groups = samples["group"].unique()
     else:
         groups = samples.loc[samples[config["oncoprint"]["stratify"]["by-column"]] == wildcards.batch, "group"].unique()
+    if not any(groups):
+        raise ValueError("No samples found. Is your sample sheet empty?")
     return groups
 
 
@@ -214,6 +221,5 @@ def get_tabix_params(wildcards):
     raise ValueError("Invalid format for tabix: {}".format(wildcards.format))
 
 
-def get_trimmed_fastqs(wc):
-    subdir = "primers" if is_activated("primers/trimming") else "adapters"
-    return expand("results/trimmed/{subdir}/{sample}/{unit}_{read}.fastq.gz", subdir=subdir, unit=units.loc[wc.sample, "unit_name"], sample=wc.sample, read=wc.read)
+def get_fastqs(wc):
+    return expand("results/trimmed/{sample}/{unit}_{read}.fastq.gz", unit=units.loc[wc.sample, "unit_name"], sample=wc.sample, read=wc.read)
