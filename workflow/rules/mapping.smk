@@ -47,8 +47,6 @@ rule bwa_mem:
 
 
 rule recalibrate_base_qualities:
-    threads:
-        100
     input:
         bam=get_recalibrate_quality_input,
         bai=lambda w: get_recalibrate_quality_input(w, bai=True),
@@ -64,7 +62,7 @@ rule recalibrate_base_qualities:
         java_opts=""
     log:
         "logs/gatk/baserecalibrator/{sample}.log"
-    threads: 8
+    threads: 20
     wrapper:
         "0.62.0/bio/gatk/baserecalibratorspark"
 

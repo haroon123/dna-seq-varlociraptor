@@ -13,6 +13,7 @@ rule render_scenario:
         "../scripts/render-scenario.py"
 
 rule varlociraptor_preprocess:
+    threads: 16
     input:
         ref="resources/genome.fasta",
         ref_idx="resources/genome.fasta.fai",
@@ -28,10 +29,11 @@ rule varlociraptor_preprocess:
     conda:
         "../envs/varlociraptor.yaml"
     shell:
-        "varlociraptor preprocess variants {params.omit_isize} --candidates {input.candidates} "
+        "varlociraptor preprocess variants --threads {threads} {params.omit_isize} --candidates {input.candidates} "
         "{input.ref} --bam {input.bam} --output {output} 2> {log}"
 
 rule varlociraptor_call:
+    threads: 16
     input:
         obs=get_group_observations,
         scenario="results/scenarios/{group}.yaml"
@@ -45,7 +47,9 @@ rule varlociraptor_call:
         "../envs/varlociraptor.yaml"
     shell:
         "varlociraptor "
-        "call variants generic --obs {params.obs} "
+        "call variants "
+        "--threads {threads} "
+        "generic --obs {params.obs} "
         "--scenario {input.scenario} > {output} 2> {log}"
 
 rule bcftools_concat:
